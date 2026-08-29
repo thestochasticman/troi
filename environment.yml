@@ -3,12 +3,12 @@
 # Every lab repo ships an environment.yml targeting this same env name.
 # In any repo, run:
 #
-#   conda env update -n borevitz_lab -f environment.yml
+#   conda env update -n troi -f environment.yml
 #
-# — creates the borevitz_lab env if it doesn't exist, and adds that
+# — creates the troi env if it doesn't exist, and adds that
 # repo's packages to it if it does (never removes anything: don't use
-# --prune). Then: conda activate borevitz_lab && pip install -e .
-name: borevitz_lab
+# --prune). Then: conda activate troi && pip install -e .
+name: troi
 channels:
   - conda-forge
   - nodefaults

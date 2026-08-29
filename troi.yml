@@ -2,13 +2,13 @@
 # ecosystem from anaconda.org + conda-forge, no source checkouts.
 #
 # Recreate — straight from GitHub, no clone needed:
-#     conda env create -f https://raw.githubusercontent.com/thestochasticman/borevitz_lab/main/borevitz_lab.yml
-#     conda activate borevitz_lab
+#     conda env create -f https://raw.githubusercontent.com/thestochasticman/troi/main/troi.yml
+#     conda activate troi
 #
-# `paddocktimeseries` pulls in borevitz-lab and the five data stores
+# `paddocktimeseries` pulls in troi and the five data stores
 # (pysentinel2, pysilo, pyozwald, pycopdem, pyslga) plus the full
 # geospatial/ML stack (GDAL, PyTorch, TensorFlow, Segment Anything, …).
-name: borevitz_lab
+name: troi
 channels:
   - conda-forge
   - pytorch

@@ -1,6 +1,6 @@
-# borevitz-lab
+# troi
 
-**The shared core of the Borevitz Lab software ecosystem** — one `Query`,
+**The shared core of the Borevitz Lab software ecosystem** — one `Troi`,
 one `Config`, one conda environment, used by every lab package.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -9,9 +9,9 @@ one `Config`, one conda environment, used by every lab package.
 
 ```python
 from datetime import date
-from borevitz_lab.query import Query
+from troi.troi import Troi
 
-query = Query(
+troi = Troi(
     bbox=[148.36265, -33.52606, 148.38265, -33.50606],  # [W, S, E, N]
     start=date(2024, 1, 1),
     end=date(2024, 12, 31),
@@ -19,24 +19,24 @@ query = Query(
 )
 ```
 
-Every downstream package takes a `Query` and answers it — same identity,
+Every downstream package takes a `Troi` and answers it — same identity,
 same caches, same reproducibility guarantees everywhere.
 
 | Package | Built on this core | What it does |
 |---|---|---|
-| [`pysentinel2`](https://github.com/thestochasticman/pysentinel2) | `Query`, `Config` | Self-filling local Sentinel-2 datacube — nothing downloaded twice |
-| [`pysilo`](https://github.com/thestochasticman/pysilo) | `Query`, `Config` | Cached SILO daily climate — fetch once per ~5 km grid point |
-| [`pyozwald`](https://github.com/thestochasticman/pyozwald) | `Query`, `Config` | Cached OzWALD meteorology + 8-day biophysical series — fetch once per grid point |
-| [`pycopdem`](https://github.com/thestochasticman/pycopdem) | `Query`, `Config` | Cached Copernicus 30 m DEM + on-read slope/TWI/aspect/HLI — one download per chunk |
-| [`pyslga`](https://github.com/thestochasticman/pyslga) | `Query`, `Config` | Cached SLGA soil properties (16 attributes × 6 depths) — one download per chunk |
-| [`PaddockTS`](https://github.com/thestochasticman/paddocktimeseries) | `Query`, `Config` | Paddock segmentation, time series, phenology, reports |
+| [`pysentinel2`](https://github.com/thestochasticman/pysentinel2) | `Troi`, `Config` | Self-filling local Sentinel-2 datacube — nothing downloaded twice |
+| [`pysilo`](https://github.com/thestochasticman/pysilo) | `Troi`, `Config` | Cached SILO daily climate — fetch once per ~5 km grid point |
+| [`pyozwald`](https://github.com/thestochasticman/pyozwald) | `Troi`, `Config` | Cached OzWALD meteorology + 8-day biophysical series — fetch once per grid point |
+| [`pycopdem`](https://github.com/thestochasticman/pycopdem) | `Troi`, `Config` | Cached Copernicus 30 m DEM + on-read slope/TWI/aspect/HLI — one download per chunk |
+| [`pyslga`](https://github.com/thestochasticman/pyslga) | `Troi`, `Config` | Cached SLGA soil properties (16 attributes × 6 depths) — one download per chunk |
+| [`PaddockTS`](https://github.com/thestochasticman/paddocktimeseries) | `Troi`, `Config` | Paddock segmentation, time series, phenology, reports |
 
 ---
 
-## `Query` — the identity layer
+## `Troi` — the identity layer
 
 A **frozen, hashable request**: *this region, this date range*. Two
-queries with the same inputs are the same query — they share every
+queries with the same inputs are the same troi — they share every
 cached artefact on disk.
 
 ```python
@@ -46,25 +46,25 @@ q.out_dir      # final outputs for this stub
 q.tmp_dir      # scratch space for this stub
 ```
 
-Storage layout is *not* `Query`'s concern — packages derive their own
+Storage layout is *not* `Troi`'s concern — packages derive their own
 cache locations (usually from the hashes) in their own `Paths` class.
 
 Three ways to build one:
 
 ```python
-Query(bbox=[w, s, e, n], start=..., end=..., stub='site_a')
+Troi(bbox=[w, s, e, n], start=..., end=..., stub='site_a')
 
-Query.from_lat_lon(lat=-34.38, lon=148.48, buffer_km=2.0,
+Troi.from_lat_lon(lat=-34.38, lon=148.48, buffer_km=2.0,
                    start=..., end=..., stub='site_b')
 
-Query.build_from_paddocks(paddocks_filepath='paddocks.gpkg',   # .gpkg / .shp / .geojson
+Troi.build_from_paddocks(paddocks_filepath='paddocks.gpkg',   # .gpkg / .shp / .geojson
                           start=..., end=..., stub='site_c')
 ```
 
-Every constructed query is recorded in a file-locked registry
-(`{out_dir}/queries.json`). Re-running an identical query is a no-op;
+Every constructed troi is recorded in a file-locked registry
+(`{out_dir}/queries.json`). Re-running an identical troi is a no-op;
 reusing a `stub` for *different* inputs raises `ValueError` — stubs
-uniquely name a query, forever.
+uniquely name a troi, forever.
 
 ## `Config` — the environment layer
 
@@ -73,31 +73,31 @@ first source found:
 
 | Source | Example |
 |---|---|
-| `~/.config/BorevitzLab.json` | `{"out_dir": "...", "email": "...", "tern_api_key": "..."}` |
-| `BOREVITZ_LAB_*` env vars | `BOREVITZ_LAB_OUTDIR`, `BOREVITZ_LAB_TMPDIR`, `BOREVITZ_LAB_EMAIL`, `BOREVITZ_LAB_TERN_KEY` |
-| Built-in defaults | `~/Documents/BorevitzLab-Outputs` · `~/Downloads/BorevitzLab-Tmp` |
+| `~/.config/Troi.json` | `{"out_dir": "...", "email": "...", "tern_api_key": "..."}` |
+| `TROI_*` env vars | `TROI_OUTDIR`, `TROI_TMPDIR`, `TROI_EMAIL`, `TROI_TERN_KEY` |
+| Built-in defaults | `~/Documents/Troi-Outputs` · `~/Downloads/Troi-Tmp` |
 
 Or bypass files entirely:
 
 ```python
-from borevitz_lab.config import Config
+from troi.config import Config
 
 cfg = Config(out_dir='/data/outputs', tmp_dir='/data/tmp')
-q = Query(..., config=cfg)
+q = Troi(..., config=cfg)
 ```
 
 ## Design rules
 
 The conventions every lab package follows:
 
-- **No inheritance.** One generic `Query`; packages *compose* with it
-  (functions and small classes taking a `Query`/`Config`), never
+- **No inheritance.** One generic `Troi`; packages *compose* with it
+  (functions and small classes taking a `Troi`/`Config`), never
   subclass it.
 - **`Config` vs `Paths`.** User-settable inputs live on `Config`;
-  locations *derived* from a `Query` or `Config` live on a per-package
+  locations *derived* from a `Troi` or `Config` live on a per-package
   `Paths` class.
-- **Layered APIs.** Data-layer functions are query-agnostic
-  (`bbox, start, end`); thin `*_query` adapters connect them to the
+- **Layered APIs.** Data-layer functions are troi-agnostic
+  (`bbox, start, end`); thin `*_troi` adapters connect them to the
   reproducibility layer.
 
 ---
@@ -106,34 +106,34 @@ The conventions every lab package follows:
 
 ### The whole lab in one command
 
-`borevitz_lab.yml` builds the entire ecosystem — this core, the five
+`troi.yml` builds the entire ecosystem — this core, the five
 data stores, PaddockTS, JupyterLab, and the full geospatial/ML stack —
 from the public conda channel, no checkouts:
 
 ```bash
-conda env create -f https://raw.githubusercontent.com/thestochasticman/borevitz_lab/main/borevitz_lab.yml
-conda activate borevitz_lab
+conda env create -f https://raw.githubusercontent.com/thestochasticman/troi/main/troi.yml
+conda activate troi
 ```
 
 ### Just this package
 
 ```bash
-conda install -c conda-forge -c thestochasticman borevitz-lab
+conda install -c conda-forge -c thestochasticman troi
 ```
 
 ### From source
 
-All lab repos share one conda environment, **`borevitz_lab`**. Each
+All lab repos share one conda environment, **`troi`**. Each
 repo's `environment.yml` creates it if missing and augments it if
 present (additive — never use `--prune`):
 
 ```bash
-conda env update -n borevitz_lab -f environment.yml
-conda activate borevitz_lab
+conda env update -n troi -f environment.yml
+conda activate troi
 pip install -e .
 ```
 
-Optional extra for `Query.build_from_paddocks`:
+Optional extra for `Troi.build_from_paddocks`:
 
 ```bash
 pip install -e '.[paddocks]'   # adds geopandas
@@ -142,8 +142,8 @@ pip install -e '.[paddocks]'   # adds geopandas
 ## Test
 
 ```bash
-python borevitz_lab/query.py    # True
-python borevitz_lab/config.py   # prints the resolved config
+python troi/troi.py    # True
+python troi/config.py   # prints the resolved config
 ```
 
 ## License

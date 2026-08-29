@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "borevitz-lab"
+name = "troi"
 version = "0.1.0"
-description = "Shared core for Borevitz Lab pipelines: Query and Config primitives"
+description = "Shared core for Borevitz Lab pipelines: Troi and Config primitives"
 readme = "README.md"
 authors = [
   { name = "Borevitz Lab, Australian National University" },
@@ -34,10 +34,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Query.build_from_paddocks reads paddock geometry files.
+# Troi.build_from_paddocks reads paddock geometry files.
 paddocks = [
   "geopandas",
 ]
 
 [tool.setuptools.packages.find]
-include = ["borevitz_lab", "borevitz_lab.*"]
+include = ["troi", "troi.*"]

@@ -1,8 +1,8 @@
 from attrs import frozen, field, Factory as F
 from contextlib import contextmanager
 from typing_extensions import Self
-from borevitz_lab.config import Config
-from borevitz_lab.config import config as default_config
+from troi.config import Config
+from troi.config import config as default_config
 from hashlib import sha256
 from datetime import date, datetime
 from os import makedirs
@@ -33,14 +33,14 @@ def locked_registry(path):
         f.seek(0); f.truncate()
         json.dump(data, f, indent=2)
 @frozen
-class Query:
+class Troi:
     """A request to run a pipeline over a region and time range.
 
     The identity layer of the Borevitz Lab ecosystem: *this region, these
     dates, this name*. Immutable and hashable — two queries with the same
-    inputs are the same query and share every cached artefact downstream.
+    inputs are the same troi and share every cached artefact downstream.
     Storage layout is deliberately NOT this class's concern: packages
-    compose with a ``Query`` (no inheritance) and derive their own cache
+    compose with a ``Troi`` (no inheritance) and derive their own cache
     locations in a per-package ``Paths`` class, typically from
     ``bbox_hash`` / ``time_hash``.
 
@@ -53,9 +53,9 @@ class Query:
             a SHA-256 hash of ``(bbox, start, end)`` so repeat runs collide
             with their cached outputs. Pass an explicit string for
             human-readable filenames.
-        tmp_dir: Per-query intermediates directory
+        tmp_dir: Per-troi intermediates directory
             (``{config.tmp_dir}/{stub}``). Created on init.
-        out_dir: Per-query final-outputs directory
+        out_dir: Per-troi final-outputs directory
             (``{config.out_dir}/{stub}``). Created on init.
         bbox_hash: Region identity — bbox snapped to ~100 m, then SHA-256.
             Keys the persistent registry.
@@ -66,15 +66,15 @@ class Query:
     Example:
         ```python
         from datetime import date
-        from borevitz_lab.query import Query
+        from troi.troi import Troi
 
-        q = Query(
+        q = Troi(
             bbox=[148.46, -34.39, 148.50, -34.36],
             start=date(2023, 1, 1),
             end=date(2023, 12, 31),
             stub='milgadara',
         )
-        q.out_dir  # '.../BorevitzLab-Outputs/milgadara'
+        q.out_dir  # '.../Troi-Outputs/milgadara'
         ```
     """
 
@@ -104,15 +104,15 @@ class Query:
         s.register()
 
     def register(s: Self) -> None:
-        """Insert this query into the persistent registry indexed by bbox_hash.
+        """Insert this troi into the persistent registry indexed by bbox_hash.
 
-        Idempotent on exact match — re-registering an identical query updates
+        Idempotent on exact match — re-registering an identical troi updates
         its ``last_run_at`` instead of appending a duplicate.
 
         Raises:
             ValueError: If ``stub`` is already registered with any different
                 attribute (bbox, start, or end). Stubs must uniquely identify
-                a query.
+                a troi.
         """
         now = datetime.utcnow().isoformat() + 'Z'
         with locked_registry(s.config.hash_file) as registry:
@@ -161,7 +161,7 @@ class Query:
 
     @classmethod
     def from_lat_lon(cls, lat: float, lon: float, buffer_km: float, start: date, end: date, stub: str = None, config: Config=default_config):
-        """Build a Query from a centre point and a square buffer in kilometres.
+        """Build a Troi from a centre point and a square buffer in kilometres.
 
         Convenience constructor for users who think in "X km around a point"
         rather than bounding-box corners. The km-to-degrees conversion is
@@ -179,14 +179,14 @@ class Query:
                 SHA-256 hash of the inputs is used.
 
         Returns:
-            Query: Instance with ``bbox = [west, south, east, north]``.
+            Troi: Instance with ``bbox = [west, south, east, north]``.
 
         Example:
             ```python
             from datetime import date
-            from borevitz_lab.query import Query
+            from troi.troi import Troi
 
-            q = Query.from_lat_lon(
+            q = Troi.from_lat_lon(
                 lat=-34.38,
                 lon=148.48,
                 buffer_km=2.0,
@@ -227,7 +227,7 @@ class Query:
         crs: str = 'EPSG:4326',
         config=default_config
     ):
-        """Build a Query from a paddocks file, enveloping all geometries into a bbox.
+        """Build a Troi from a paddocks file, enveloping all geometries into a bbox.
 
         Reads paddock geometries from a GeoPackage, Shapefile, or GeoJSON
         and computes a bounding box that contains all features.
@@ -250,16 +250,16 @@ class Query:
                 Default ``'EPSG:4326'``. The bbox is always returned in EPSG:4326.
 
         Returns:
-            Query: Instance with ``bbox = [west, south, east, north]``
+            Troi: Instance with ``bbox = [west, south, east, north]``
             encompassing all paddock geometries.
 
         Example:
             ```python
             from datetime import date
-            from borevitz_lab.query import Query
+            from troi.troi import Troi
 
             # From GeoJSON with custom label column
-            q = Query.build_from_paddocks(
+            q = Troi.build_from_paddocks(
                 paddocks_filepath='/path/to/paddocks.json',
                 start=date(2023, 1, 1),
                 end=date(2023, 12, 31),
@@ -318,45 +318,45 @@ import tempfile
 
 def _temp_config():
     """Return a Config rooted in a fresh tmpdir so tests don't pollute the real registry."""
-    tmpdir = tempfile.mkdtemp(prefix='borevitz_lab_test_')
+    tmpdir = tempfile.mkdtemp(prefix='troi_test_')
     return Config(out_dir=tmpdir, tmp_dir=tmpdir)
 
 def test_instantiation():
-    query = Query(
+    troi = Troi(
         bbox=[148.36265, -33.52606, 148.38265, -33.50606],
         start=date(2020, 1, 1),
         end=date(2021, 12, 31),
-        stub='RANDOM_BOREVITZ_LAB_QUERY_2',
+        stub='RANDOM_TROI_QUERY_2',
         config=_temp_config(),
     )
     return True
 
 def test__str__():
     from unittest.mock import patch
-    query = Query(
+    troi = Troi(
         bbox=[148.36265, -33.52606, 148.38265, -33.50606],
         start=date(2020, 1, 1),
         end=date(2021, 12, 31),
-        stub='RANDOM_BOREVITZ_LAB_QUERY_2',
+        stub='RANDOM_TROI_QUERY_2',
         config=_temp_config(),
     )
-    def print_query(query: Query):
+    def print_troi(troi: Troi):
         from unittest.mock import patch
-        print(query)
+        print(troi)
         return True
     with patch('builtins.print') as mock_print:
-        result = print_query(query)
+        result = print_troi(troi)
         return result is True
 
 
-def test_add_different_query_with_same_bbox():
-    """Adding a different query with the same bbox should append under the same bbox_hash."""
+def test_add_different_troi_with_same_bbox():
+    """Adding a different troi with the same bbox should append under the same bbox_hash."""
     cfg = _temp_config()
     bbox = [148.36265, -33.52606, 148.38265, -33.50606]
 
-    q1 = Query(bbox=bbox, start=date(2020, 1, 1), end=date(2021, 12, 31),
+    q1 = Troi(bbox=bbox, start=date(2020, 1, 1), end=date(2021, 12, 31),
                stub='query_one', config=cfg)
-    q2 = Query(bbox=bbox, start=date(2022, 1, 1), end=date(2023, 12, 31),
+    q2 = Troi(bbox=bbox, start=date(2022, 1, 1), end=date(2023, 12, 31),
                stub='query_two', config=cfg)
 
     if q1.bbox_hash != q2.bbox_hash:
@@ -377,13 +377,13 @@ def test_add_different_query_with_same_bbox():
 def test_stub_collision_raises():
     """Reusing a stub with different attributes must raise ValueError."""
     cfg = _temp_config()
-    Query(
+    Troi(
         bbox=[148.36265, -33.52606, 148.38265, -33.50606],
         start=date(2020, 1, 1), end=date(2021, 12, 31),
         stub='collide', config=cfg,
     )
     try:
-        Query(
+        Troi(
             bbox=[149.0, -34.0, 149.1, -33.9],
             start=date(2020, 1, 1), end=date(2021, 12, 31),
             stub='collide', config=cfg,
@@ -397,7 +397,7 @@ def test():
     return all([
         test_instantiation(),
         test__str__(),
-        test_add_different_query_with_same_bbox(),
+        test_add_different_troi_with_same_bbox(),
         test_stub_collision_raises(),
     ])
 

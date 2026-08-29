@@ -9,8 +9,8 @@ from json import load
 import os
 
 build_from_out_dir = F(lambda s: f'{s.out_dir}/queries.json', takes_self=True)
-_out = expanduser('~/Documents/BorevitzLab-Outputs')
-_tmp = expanduser('~/Downloads/BorevitzLab-Tmp')
+_out = expanduser('~/Documents/Troi-Outputs')
+_tmp = expanduser('~/Downloads/Troi-Tmp')
 @frozen
 class Config:
     out_dir: str = _out
@@ -34,13 +34,13 @@ class Config:
             ]
         )
 
-_out = os.getenv("BOREVITZ_LAB_OUTDIR", _out)
-_tmp = os.getenv("BOREVITZ_LAB_TMPDIR", _tmp)
-_email = os.getenv("BOREVITZ_LAB_EMAIL") # default None
-_tern_api_key = os.getenv("BOREVITZ_LAB_TERN_KEY") # default None
+_out = os.getenv("TROI_OUTDIR", _out)
+_tmp = os.getenv("TROI_TMPDIR", _tmp)
+_email = os.getenv("TROI_EMAIL") # default None
+_tern_api_key = os.getenv("TROI_TERN_KEY") # default None
 _default = Config(_out, _tmp, email=_email, tern_api_key=_tern_api_key)
 
-confpath = os.getenv("BOREVITZ_LAB_CONFIG", os.path.expanduser('~/.config/BorevitzLab.json'))
+confpath = os.getenv("TROI_CONFIG", os.path.expanduser('~/.config/Troi.json'))
 config = Config(**load(open(confpath))) if exists(confpath) else _default
 
 
