@@ -9,7 +9,7 @@ one `Config`, one conda environment, used by every lab package.
 
 ```python
 from datetime import date
-from troi.troi import Troi
+from troi import Troi
 
 troi = Troi(
     bbox=[148.36265, -33.52606, 148.38265, -33.50606],  # [W, S, E, N]
@@ -80,7 +80,7 @@ first source found:
 Or bypass files entirely:
 
 ```python
-from troi.config import Config
+from troi import Config
 
 cfg = Config(out_dir='/data/outputs', tmp_dir='/data/tmp')
 q = Troi(..., config=cfg)
@@ -101,6 +101,8 @@ The conventions every lab package follows:
   reproducibility layer.
 
 ---
+
+📚 **Reference documentation:** [`docs/`](docs/README.md) — the `Troi` class, `Config` resolution, the registry, and the ecosystem conventions.
 
 ## Install
 
@@ -142,8 +144,8 @@ pip install -e '.[paddocks]'   # adds geopandas
 ## Test
 
 ```bash
-python troi/troi.py    # True
-python troi/config.py   # prints the resolved config
+python -m troi.troi     # True
+python -m troi.config   # prints the resolved config
 ```
 
 ## License
