@@ -106,32 +106,21 @@ The conventions every lab package follows:
 
 ## Install
 
-### The whole lab in one command
-
-`troi.yml` builds the entire ecosystem — this core, the five
-data stores, PaddockTS, JupyterLab, and the full geospatial/ML stack —
-from the public conda channel, no checkouts:
-
-```bash
-conda env create -f https://raw.githubusercontent.com/thestochasticman/troi/main/troi.yml
-conda activate troi
-```
-
 ### Just this package
 
 ```bash
-conda install -c conda-forge -c thestochasticman troi
+pip install git+https://github.com/thestochasticman/troi.git
 ```
+
+(For the whole pipeline, install
+[`paddocktimeseries`](https://github.com/thestochasticman/paddocktimeseries) —
+its `pip install .` pulls troi and the five data stores from GitHub.)
 
 ### From source
 
-All lab repos share one conda environment, **`troi`**. Each
-repo's `environment.yml` creates it if missing and augments it if
-present (additive — never use `--prune`):
-
 ```bash
-conda env update -n troi -f environment.yml
-conda activate troi
+git clone https://github.com/thestochasticman/troi.git
+cd troi
 pip install -e .
 ```
 
