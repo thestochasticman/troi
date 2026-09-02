@@ -110,6 +110,8 @@ The conventions every lab package follows:
 ### Just this package
 
 ```bash
+pip install pytroi           # from PyPI (distribution name pytroi, import troi)
+# or straight from GitHub:
 pip install git+https://github.com/thestochasticman/troi.git
 ```
 
