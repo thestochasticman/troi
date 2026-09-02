@@ -1,7 +1,8 @@
 # troi
 
-**The shared core of the Borevitz Lab software ecosystem** — one `Troi`,
-one `Config`, one conda environment, used by every lab package.
+**The shared core of the Borevitz Lab software ecosystem** — one
+`Troi` (Time and Region Of Interest), one `Config`, used by every lab
+package.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
@@ -29,7 +30,7 @@ same caches, same reproducibility guarantees everywhere.
 | [`pyozwald`](https://github.com/thestochasticman/pyozwald) | `Troi`, `Config` | Cached OzWALD meteorology + 8-day biophysical series — fetch once per grid point |
 | [`pycopdem`](https://github.com/thestochasticman/pycopdem) | `Troi`, `Config` | Cached Copernicus 30 m DEM + on-read slope/TWI/aspect/HLI — one download per chunk |
 | [`pyslga`](https://github.com/thestochasticman/pyslga) | `Troi`, `Config` | Cached SLGA soil properties (16 attributes × 6 depths) — one download per chunk |
-| [`PaddockTS`](https://github.com/thestochasticman/paddocktimeseries) | `Troi`, `Config` | Paddock segmentation, time series, phenology, reports |
+| [`PaddockTS`](https://github.com/johnburley3000/paddocktimeseries) | `Troi`, `Config` | Paddock segmentation, time series, phenology, reports |
 
 ---
 
@@ -113,7 +114,7 @@ pip install git+https://github.com/thestochasticman/troi.git
 ```
 
 (For the whole pipeline, install
-[`paddocktimeseries`](https://github.com/thestochasticman/paddocktimeseries) —
+[`paddocktimeseries`](https://github.com/johnburley3000/paddocktimeseries) —
 its `pip install .` pulls troi and the five data stores from GitHub.)
 
 ### From source

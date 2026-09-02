@@ -1,6 +1,6 @@
 # troi — reference documentation
 
-`troi` (temporal region of interest) is the shared core of the Borevitz
+`troi` (Time and Region Of Interest) is the shared core of the Borevitz
 Lab ecosystem: the identity object every package answers, and the
 configuration every package reads. It contains exactly two things and a
 set of conventions.
