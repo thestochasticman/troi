@@ -6,7 +6,7 @@ package.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
-[![Borevitz Lab](https://img.shields.io/badge/Borevitz%20Lab-ANU-2ea44f)](https://borevitzlab.anu.edu.au/)
+[![Borevitz Lab](https://img.shields.io/badge/Borevitz%20Lab-ANU-2ea44f)](https://biology.anu.edu.au/research/research-groups/borevitz-group-plant-genomics-climate-adaption)
 
 ```python
 from datetime import date
