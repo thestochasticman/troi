@@ -9,8 +9,27 @@ from os import makedirs
 from tabulate import tabulate
 from os.path import exists
 import json
-import fcntl
 import os
+
+# File locking is platform-specific: fcntl on POSIX, msvcrt on Windows.
+try:
+    import fcntl
+
+    def _lock_file(f):
+        fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+
+    def _unlock_file(f):
+        fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+except ImportError:  # Windows
+    import msvcrt
+
+    def _lock_file(f):
+        f.seek(0)
+        msvcrt.locking(f.fileno(), msvcrt.LK_LOCK, 1)
+
+    def _unlock_file(f):
+        f.seek(0)
+        msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
 
 encode = lambda x: sha256(x.encode()).hexdigest()
 build_from_input = F(lambda s: encode(''.join([str(s.bbox), str(s.start), str(s.end)])), takes_self=True)
@@ -26,12 +45,15 @@ def check_if_stub_exists(stub: str, hash_map: dict[str, ])->bool:
 @contextmanager
 def locked_registry(path):
     with open(path, 'a+') as f:
-        fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-        f.seek(0)
-        data = json.load(f) if os.path.getsize(path) else {}
-        yield data
-        f.seek(0); f.truncate()
-        json.dump(data, f, indent=2)
+        _lock_file(f)
+        try:
+            f.seek(0)
+            data = json.load(f) if os.path.getsize(path) else {}
+            yield data
+            f.seek(0); f.truncate()
+            json.dump(data, f, indent=2)
+        finally:
+            _unlock_file(f)
 @frozen
 class Troi:
     """A request to run a pipeline over a region and time range.
