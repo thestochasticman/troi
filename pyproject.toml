@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "troi-core"
-version = "0.1.1"
+version = "0.2.0+gadi"
 description = "Shared core for Borevitz Lab pipelines: Troi and Config primitives"
 readme = "README.md"
 authors = [

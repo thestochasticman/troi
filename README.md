@@ -30,6 +30,7 @@ same caches, same reproducibility guarantees everywhere.
 | [`pyozwald`](https://github.com/thestochasticman/pyozwald) | `Troi`, `Config` | Cached OzWALD meteorology + 8-day biophysical series — fetch once per grid point |
 | [`pycopdem`](https://github.com/thestochasticman/pycopdem) | `Troi`, `Config` | Cached Copernicus 30 m DEM + on-read slope/TWI/aspect/HLI — one download per chunk |
 | [`pyslga`](https://github.com/thestochasticman/pyslga) | `Troi`, `Config` | Cached SLGA soil properties (16 attributes × 6 depths) — one download per chunk |
+| [`pysmips`](https://github.com/thestochasticman/pysmips) | `Troi`, `Config` | Cached SMIPS daily soil moisture — one download per pixel-day |
 | [`PaddockTS`](https://github.com/johnburley3000/paddocktimeseries) | `Troi`, `Config` | Paddock segmentation, time series, phenology, reports |
 
 ---

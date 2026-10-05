@@ -11,6 +11,7 @@ set of conventions.
 | [`Config`](config.md) | Where data lives and which credentials to use; exact resolution order |
 | [The registry](registry.md) | `queries.json`: stub uniqueness, file locking, crash safety |
 | [Ecosystem conventions](conventions.md) | Composition over inheritance, `Config` vs `Paths`, troi-agnostic layers |
+| [The filesystem ledger](ledger.md) | `troi.ledger` markers and claims, the store write protocol, absent markers, the native georeferencing contract |
 
 ```python
 from datetime import date
