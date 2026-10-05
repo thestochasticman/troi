@@ -238,7 +238,10 @@ class Claim:
 
 
 class _KeepAlive:
-    def __init__(self, claim: Claim, every_s: float):
+    """Calls ``holder.heartbeat()`` every ``every_s`` seconds on a daemon
+    thread; ``holder`` is a :class:`Claim` or :class:`Claims`."""
+
+    def __init__(self, claim, every_s: float):
         self.claim, self.every_s = claim, every_s
 
     def __enter__(self):
@@ -264,7 +267,7 @@ class Claims:
     def __init__(self, root: str, keys: Iterable, **claim_kw):
         self.claims = [Claim(root, k, **claim_kw) for k in sorted(keys, key=_key_name)]
 
-    def __enter__(self) -> list[Claim]:
+    def __enter__(self) -> 'Claims':
         acquired = []
         try:
             for c in self.claims:
@@ -274,7 +277,10 @@ class Claims:
             for c in reversed(acquired):
                 c.release()
             raise
-        return self.claims
+        return self
+
+    def __iter__(self):
+        return iter(self.claims)
 
     def __exit__(self, *exc) -> None:
         for c in reversed(self.claims):
@@ -283,6 +289,11 @@ class Claims:
     def heartbeat(self) -> None:
         for c in self.claims:
             c.heartbeat()
+
+    def keepalive(self, every_s: Optional[float] = None):
+        """Context manager running :meth:`heartbeat` on a daemon thread."""
+        lease = min(c.lease_s for c in self.claims) if self.claims else 600.0
+        return _KeepAlive(self, every_s or max(5.0, lease / 4))
 
 
 def ensure_array(root: str, group, name: str, **create_kw):
