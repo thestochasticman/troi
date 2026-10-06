@@ -106,6 +106,47 @@ The conventions every lab package follows:
 
 📚 **Reference documentation:** [`docs/`](docs/README.md) — the `Troi` class, `Config` resolution, the registry, and the ecosystem conventions.
 
+## The stores on Gadi
+
+Six store packages are built on troi, and two consumers read them. On
+the `gadi` branches every store keeps its ledger as files, because
+Gadi's Lustre makes SQLite unsafe across nodes and no database server
+can run there.
+
+```mermaid
+flowchart LR
+    subgraph core ["troi"]
+        direction TB
+        T["Troi · Config · Paths"]
+        LG["troi.ledger<br/>Markers · Claim · GapReport"]
+        AB["troi.absent"]
+    end
+    subgraph stores ["stores · native grids · fill once, ever"]
+        direction TB
+        S1["pysmips"]
+        S2["pysilo"]
+        S3["pyozwald"]
+        S4["pyslga"]
+        S5["pycopdem"]
+        S6["pysentinel2"]
+    end
+    subgraph consumers
+        direction TB
+        P["PaddockTS"]
+        E["DownscalingMoistureModel<br/>regrids onto the Sentinel-2 grid"]
+    end
+    core --> stores
+    stores --> P
+    stores --> E
+```
+
+Every store has the same anatomy (a sparse Zarr store, a ledger of
+populated units, dated absent markers, and `claims/` mutex directories)
+and the same three entry points (`fill`, `get_ds`, `gaps`). The write
+protocol, the claim lease, the two kinds of ledger and the `gaps()`
+classification are explained with diagrams in
+[`docs/ledger.md`](docs/ledger.md).
+
 ## Install
 
 ### Just this package
